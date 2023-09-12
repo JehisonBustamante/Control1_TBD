@@ -11,8 +11,7 @@ CREATE TABLE Producto(
 CREATE TABLE Tipo_doc(
     ID_DOC int primary key,
     tipo varchar(255) NOT NULL,
-    precio_total int NOT NULL,
-    fecha date NOT NULL
+    precio_total int NOT NULL
 );
 
 CREATE TABLE Tienda(
@@ -38,10 +37,11 @@ CREATE TABLE Vendedor(
 
 CREATE TABLE Venta(
     ID_VENTA int primary key,
-    ID_TIENDA int NOT NULL,
     ID_DOC int NOT NULL,
-    foreign key (ID_TIENDA) references Tienda(ID_TIENDA),
-    foreign key (ID_DOC) references Tipo_doc(ID_DOC)
+    ID_TIENDA int NOT NULL,
+    fecha date NOT NULL,
+    foreign key (ID_DOC) references Tipo_doc(ID_DOC),
+    foreign key (ID_TIENDA) references Tienda(ID_TIENDA)
 );
 
 CREATE TABLE Prod_Venta (
