@@ -56,6 +56,7 @@ CREATE TABLE Prod_Venta (
 CREATE TABLE Sueldo(
     ID_SUELDO int primary key,
     cantidad int,
+    fecha_pago date,
     ID_EMPLEADO int,
     foreign key (ID_EMPLEADO) references Empleado(ID_EMPLEADO)
 );
