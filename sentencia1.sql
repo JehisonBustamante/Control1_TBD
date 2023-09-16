@@ -1,3 +1,4 @@
+-- SENTENCIA 1: PRODUCTO MÁS VENDIDO POR MES
 WITH VentasPorMes AS (
 	SELECT DATE_TRUNC('month', V.fecha) AS Mes, P.nombre AS Producto_Mas_Vendido, 
 	COUNT(PV.id_prod) AS total_vendido

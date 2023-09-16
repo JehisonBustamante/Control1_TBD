@@ -81,3 +81,10 @@ CREATE TABLE Tienda_Comuna(
     foreign key (ID_TIENDA) references Tienda(ID_TIENDA),
     foreign key (ID_COMUNA) references Comuna(ID_COMUNA)
 );
+
+CREATE TABLE Producto_Tienda(
+    ID_PROD int,
+    ID_TIENDA int,
+    foreign key (ID_PROD) references Producto(ID_PROD),
+    foreign key (ID_TIENDA) references Tienda(ID_TIENDA)
+);
