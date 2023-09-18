@@ -19,9 +19,16 @@ CREATE TABLE Tienda(
     nombre varchar(255) NOT NULL
 );
 
+CREATE TABLE Cargo(
+    ID_CARGO int primary key,
+    nombre_cargo varchar(255) NOT NULL
+);
+
 CREATE TABLE Empleado(
     ID_EMPLEADO int primary key,
-    nombre varchar(255) NOT NULL
+    nombre varchar(255) NOT NULL,
+    ID_CARGO int,
+    foreign key(ID_CARGO) references Cargo(ID_CARGO)
 );
 
 CREATE TABLE Comuna(
