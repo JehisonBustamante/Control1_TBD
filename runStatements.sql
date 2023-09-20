@@ -47,6 +47,38 @@ GROUP BY
 ORDER BY
     EXTRACT(MONTH FROM fecha);
 
+--SETENCIA 4: EMPLEADO QUE GANO MAS POR TIENDA 2020, INDICANDO LA COMUNA DONDE VIVE Y EL CARGO QUE TIENE EN LA EMPRESA
+WITH EmpleadosOrdenados AS (
+    SELECT
+        ti.ID_TIENDA AS id_tienda,
+        e.nombre AS nombre_empleado,
+        c.nombre_cargo AS cargo,
+        s.cantidad AS mayor_sueldo_2020,
+        ROW_NUMBER() OVER (PARTITION BY ti.ID_TIENDA ORDER BY s.cantidad DESC) AS num_empleado
+    FROM
+        Tienda AS ti
+    JOIN
+        Tienda_Empleado AS te ON ti.ID_TIENDA = te.ID_TIENDA
+    JOIN
+        Empleado AS e ON te.ID_EMPLEADO = e.ID_EMPLEADO
+    JOIN
+        Cargo AS c ON e.ID_CARGO = c.ID_CARGO
+    JOIN
+        Sueldo AS s ON e.ID_EMPLEADO = s.ID_EMPLEADO
+    WHERE
+        EXTRACT(YEAR FROM s.fecha_pago) = 2020
+)
+
+SELECT
+    id_tienda,
+    nombre_empleado,
+    cargo,
+    mayor_sueldo_2020
+FROM
+    EmpleadosOrdenados
+WHERE
+    num_empleado = 1;
+
 -- SENTENCIA 5: LA TIENDA QUE TIENE MENOS EMPLEADOS
 SELECT t.nombre AS nombre_tienda, COUNT(te.ID_EMPLEADO) AS cantidad_empleados
 FROM Tienda AS t
