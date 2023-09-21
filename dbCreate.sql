@@ -95,3 +95,4 @@ CREATE TABLE Producto_Tienda(
     foreign key (ID_PROD) references Producto(ID_PROD),
     foreign key (ID_TIENDA) references Tienda(ID_TIENDA)
 );
+

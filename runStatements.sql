@@ -101,20 +101,26 @@ WITH Meses AS (
         date_trunc('month', CURRENT_DATE),
         interval '1 month'
     ) AS Mes
+),
+VentasPorVendedor AS (
+    SELECT
+        EXTRACT(MONTH FROM Mes.Mes) AS Mes,
+        VD.ID_VENDEDOR,
+        E.nombre AS NombreVendedor,
+        COUNT(*) AS VentasDelMes,
+        ROW_NUMBER() OVER (PARTITION BY EXTRACT(MONTH FROM Mes.Mes) ORDER BY COUNT(*) DESC) AS Orden
+    FROM Meses Mes
+    LEFT JOIN Venta V ON EXTRACT(YEAR FROM Mes.Mes) = EXTRACT(YEAR FROM V.fecha)
+                      AND EXTRACT(MONTH FROM Mes.Mes) = EXTRACT(MONTH FROM V.fecha)
+    LEFT JOIN Prod_Venta PV ON V.ID_VENTA = PV.ID_VENTA
+    LEFT JOIN Vendedor VD ON PV.ID_VENDEDOR = VD.ID_VENDEDOR
+    LEFT JOIN Empleado E ON VD.ID_EMPLEADO = E.ID_EMPLEADO
+    GROUP BY EXTRACT(MONTH FROM Mes.Mes), VD.ID_VENDEDOR, E.nombre
 )
-SELECT
-    EXTRACT(MONTH FROM Mes.Mes) AS Mes,
-    VD.ID_VENDEDOR,
-    E.nombre AS NombreVendedor,
-    COUNT(*) AS VentasDelMes
-FROM Meses Mes
-LEFT JOIN Venta V ON EXTRACT(YEAR FROM Mes.Mes) = EXTRACT(YEAR FROM V.fecha)
-                  AND EXTRACT(MONTH FROM Mes.Mes) = EXTRACT(MONTH FROM V.fecha)
-LEFT JOIN Prod_Venta PV ON V.ID_VENTA = PV.ID_VENTA
-LEFT JOIN Vendedor VD ON PV.ID_VENDEDOR = VD.ID_VENDEDOR
-LEFT JOIN Empleado E ON VD.ID_EMPLEADO = E.ID_EMPLEADO
-GROUP BY EXTRACT(MONTH FROM Mes.Mes), VD.ID_VENDEDOR, E.nombre
-ORDER BY EXTRACT(MONTH FROM Mes.Mes), VentasDelMes DESC;
+SELECT Mes, ID_VENDEDOR, NombreVendedor, VentasDelMes
+FROM VentasPorVendedor
+WHERE Orden = 1
+ORDER BY Mes;
 
 -- SENTENCIA 7: EL VENDEDOR QUE HA RECAUDADO MÁS DINERO PARA LA TIENDA POR AÑO
 WITH VentasPorVendedor AS (
@@ -231,16 +237,22 @@ WITH Meses AS (
         date_trunc('month', CURRENT_DATE),
         interval '1 month'
     ) AS Mes
+),
+VentasPorTienda AS (
+    SELECT
+        EXTRACT(MONTH FROM Mes.Mes) AS Mes,
+        T.ID_TIENDA,
+        T.nombre AS NombreTienda,
+        SUM(TD.precio_total) AS RecaudacionDelMes,
+        ROW_NUMBER() OVER (PARTITION BY EXTRACT(MONTH FROM Mes.Mes) ORDER BY SUM(TD.precio_total)) AS Orden
+    FROM Meses Mes
+    LEFT JOIN Venta V ON EXTRACT(YEAR FROM Mes.Mes) = EXTRACT(YEAR FROM V.fecha)
+                      AND EXTRACT(MONTH FROM Mes.Mes) = EXTRACT(MONTH FROM V.fecha)
+    LEFT JOIN Tienda T ON V.ID_TIENDA = T.ID_TIENDA
+    LEFT JOIN Tipo_Doc TD ON V.ID_DOC = TD.ID_DOC
+    GROUP BY EXTRACT(MONTH FROM Mes.Mes), T.ID_TIENDA, T.nombre
 )
-SELECT
-    EXTRACT(MONTH FROM Mes.Mes) AS Mes,
-    T.ID_TIENDA,
-    T.nombre AS NombreTienda,
-    SUM(TD.precio_total) AS RecaudacionDelMes
-FROM Meses Mes
-LEFT JOIN Venta V ON EXTRACT(YEAR FROM Mes.Mes) = EXTRACT(YEAR FROM V.fecha)
-                  AND EXTRACT(MONTH FROM Mes.Mes) = EXTRACT(MONTH FROM V.fecha)
-LEFT JOIN Tienda T ON V.ID_TIENDA = T.ID_TIENDA
-LEFT JOIN Tipo_Doc TD ON V.ID_DOC = TD.ID_DOC
-GROUP BY EXTRACT(MONTH FROM Mes.Mes), T.ID_TIENDA, T.nombre
-ORDER BY EXTRACT(MONTH FROM Mes.Mes), RecaudacionDelMes ASC;
+SELECT Mes, ID_TIENDA, NombreTienda, RecaudacionDelMes
+FROM VentasPorTienda
+WHERE Orden = 1
+ORDER BY Mes;
